@@ -82,12 +82,13 @@ class LolAggregate(object):
             info["matchid"] = matchid
             info["stats"] = {}
 
-
+            #traverse returned objects for info 
             self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
             participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
             lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
             stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
 
+            #assemble object
             info["stats"]["assists"] = stats["assists"];
             info["stats"]["goldEarned"] = stats["goldEarned"];
             info["stats"]["kills"] = stats["kills"];
@@ -95,9 +96,17 @@ class LolAggregate(object):
             info["stats"]["winner"] = stats["winner"];
             info["stats"]["lane"] = lane;
 
+            #append to instance variable "info"
             self.info.append(info)
-            if requests>=self.options["request_limit"]:
-                break
+
+            #break if request limit is set
+            try:
+              self.options["request_limit"]
+            except NameError:
+            else:
+              if requests>=self.options["request_limit"]:
+                  break
+
 
     #write instance varaibles to file
     def writeToFile(self):
