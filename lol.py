@@ -14,6 +14,7 @@
 
 
 #module imports
+import sys;
 import requests;
 import json;
 
@@ -41,8 +42,16 @@ class LolAggregate(object):
         url = "https://euw.api.pvp.net/api/lol/euw/v2.2/match/"+str(matchID)+"?includeTimeline=false&api_key="+key
         print(url)
         request = requests.get(url)
+        print request.encoding
         parsedRequest = json.loads(request.text)
         return parsedRequest
+
+    @staticmethod
+    def getParticipantId(userID,matchInfo):
+        #print json.dumps(matchInfo, indent=4, sort_keys=True)
+        for participant in matchInfo["participantIdentities"]:
+            if participant["player"]["summonerId"]==int(userID):
+                return participant["participantId"]
 
     #debug methods
     def echo(self):
@@ -53,37 +62,58 @@ class LolAggregate(object):
 
         self.matches = [];
         self.matchinfo = {};
-
+        self.info = [];
         self.parsedMatches = LolAggregate.doCurl(self.matchesURL)
-
+        #print json.dumps(self.parsedMatches, indent=4, sort_keys=True)
         #loop through response matches, append to matches instance variable
         for match in self.parsedMatches["matches"]:
-            self.matches.append(match["matchId"])
+             self.matches.append(match["matchId"])
 
         #for each matchid, do curl on API, add to matchinfo instance variable
-        for matchid in self.matches: #Strongly recommend limiting the number of times this runs maybe with range
+        #for matchid in self.matches: #Strongly recommend limiting the number of times this runs maybe with range
+        requests = 0
+        for matchid in self.matches:
 
-      #  for matchid in range(0, self.matches[matchid] clem lol
-
-
+            requests+=1
             # https://wiki.python.org/moin/ForLoop
             #This line runs for every match returned by the first request.
             #Petey has played a shit load of this game
+            info = {}
+            info["matchid"] = matchid
+            info["stats"] = {}
+
+
             self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
+            participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
+            lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
+            stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
+
+            info["stats"]["assists"] = stats["assists"];
+            info["stats"]["goldEarned"] = stats["goldEarned"];
+            info["stats"]["kills"] = stats["kills"];
+            info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
+            info["stats"]["winner"] = stats["winner"];
+            info["stats"]["lane"] = lane;
+
+            self.info.append(info)
+            if requests>=self.options["request_limit"]:
+                break
 
     #write instance varaibles to file
     def writeToFile(self):
         #write to textfile here
         f = open("write.txt","w")
-        f.write(json.dumps(self.parsedMatches, indent=4, sort_keys=True))
-        f.write(json.dumps(self.matches, indent=4, sort_keys=True))
-        f.write(json.dumps(self.matchinfo, indent=4, sort_keys=True))
+        # f.write(json.dumps(self.parsedMatches, indent=4, sort_keys=True))
+        # f.write(json.dumps(self.matches, indent=4, sort_keys=True))
+        # f.write(json.dumps(self.matchinfo, indent=4, sort_keys=True))
+        f.write(json.dumps(self.info, indent=4, sort_keys=True))
         f.close();
 
 #arguments passed to new object
 arguments = {
 "api_key":"RGAPI-5a0bc5da-5244-45f6-bfe1-b1a42b892835",
-"player_key":"36098962" #change the player id here, by changing this number you could get your own info instead of Pete's
+"player_key":"36098962", #change the player id here, by changing this number you could get your own info instead of Pete's
+"request_limit":5 # will limit the number of requests by stopping loop after this number of requests
 }
 
 #Main script calls

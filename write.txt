@@ -1,0 +1,57 @@
+[
+    {
+        "matchid": 2966531109, 
+        "stats": {
+            "assists": 8, 
+            "goldEarned": 14128, 
+            "kills": 5, 
+            "lane": "TOP", 
+            "totalDamageDealt": 203776, 
+            "winner": false
+        }
+    }, 
+    {
+        "matchid": 2966499437, 
+        "stats": {
+            "assists": 9, 
+            "goldEarned": 13944, 
+            "kills": 2, 
+            "lane": "TOP", 
+            "totalDamageDealt": 200333, 
+            "winner": true
+        }
+    }, 
+    {
+        "matchid": 2966487332, 
+        "stats": {
+            "assists": 5, 
+            "goldEarned": 10789, 
+            "kills": 1, 
+            "lane": "JUNGLE", 
+            "totalDamageDealt": 146905, 
+            "winner": true
+        }
+    }, 
+    {
+        "matchid": 2966112744, 
+        "stats": {
+            "assists": 5, 
+            "goldEarned": 11615, 
+            "kills": 1, 
+            "lane": "MIDDLE", 
+            "totalDamageDealt": 136967, 
+            "winner": true
+        }
+    }, 
+    {
+        "matchid": 2966032481, 
+        "stats": {
+            "assists": 9, 
+            "goldEarned": 11643, 
+            "kills": 4, 
+            "lane": "JUNGLE", 
+            "totalDamageDealt": 150542, 
+            "winner": true
+        }
+    }
+]

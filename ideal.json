@@ -1,0 +1,51 @@
+library(tidyjson) 
+library(dplyr) 
+
+
+match_json <- '
+[
+    {   
+         "matchid":"1908260653", 
+         "stats": [
+            {
+
+                "assists": 14,
+                "goldEarned": 16706,
+                "kills": 9,
+                "totalDamageDealt": 238050,
+                "winner": false,
+                "lane": "JUNGLE"
+            }
+        ]
+    },
+
+    {
+        "matchid":"19023234653", 
+        "stats": [
+            {
+
+                "assists": 12,
+                "goldEarned": 16706,
+                "kills": 3,
+                "totalDamageDealt": 11450,
+                "winner": true,
+                "lane": "SUPPORT"
+            }
+        ]
+    }
+]'
+
+match <- match_json %>%
+  gather_array %>%                                     
+  spread_values(matchid = jstring("matchid")) %>%        
+  enter_object("stats") %>% gather_array %>%      
+  spread_values(
+    stats.assists = jnumber("assists"),
+    stats.goldEarned = jnumber("goldEarned"),
+    stats.kills = jnumber("kills"),
+    stats.totalDamageDealt = jnumber("totalDamageDealt"),
+    stats.winner = jboolean("winner"),
+    stats.lane = jstring("lane")
+    ) %>%
+select(matchid, stats.assists, stats.goldEarned, stats.kills, stats.totalDamageDealt, stats.winner, stats.lane)
+
