@@ -82,7 +82,7 @@ class LolAggregate(object):
             info["matchid"] = matchid
             info["stats"] = {}
 
-            #traverse returned objects for info 
+            #traverse returned objects for info
             self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
             participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
             lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
@@ -101,8 +101,9 @@ class LolAggregate(object):
 
             #break if request limit is set
             try:
-              self.options["request_limit"]
+                self.options["request_limit"]
             except NameError:
+                print "unset"
             else:
               if requests>=self.options["request_limit"]:
                   break
