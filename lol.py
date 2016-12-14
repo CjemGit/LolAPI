@@ -42,16 +42,20 @@ class LolAggregate(object):
         url = "https://euw.api.pvp.net/api/lol/euw/v2.2/match/"+str(matchID)+"?includeTimeline=false&api_key="+key
         print(url)
         request = requests.get(url)
-        print request.encoding
+        print(request.encoding)
         parsedRequest = json.loads(request.text)
         return parsedRequest
 
     @staticmethod
     def getParticipantId(userID,matchInfo):
         #print json.dumps(matchInfo, indent=4, sort_keys=True)
-        for participant in matchInfo["participantIdentities"]:
-            if participant["player"]["summonerId"]==int(userID):
-                return participant["participantId"]
+        success = True if "participantIdentities" in matchInfo == "Present" else False
+        if success == True:
+            for participant in matchInfo["participantIdentities"]:
+                if participant["player"]["summonerId"]==int(userID):
+                    return participant["participantId"]
+        else:
+            return False
 
     #debug methods
     def echo(self):
@@ -84,26 +88,25 @@ class LolAggregate(object):
                 info["matchid"] = matchid
                 info["stats"] = {}
 
-
-
                 #traverse returned objects for info
                 self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
                 fail = True if "status" in self.matchinfo[matchid] == "Present" else False
                 if fail==False:
                     participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
-                    lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
-                    stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
+                    if participant:
+                        lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
+                        stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
 
-                    #assemble object
-                    info["stats"]["assists"] = stats["assists"];
-                    info["stats"]["goldEarned"] = stats["goldEarned"];
-                    info["stats"]["kills"] = stats["kills"];
-                    info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
-                    info["stats"]["winner"] = stats["winner"];
-                    info["stats"]["lane"] = lane;
+                        #assemble object
+                        info["stats"]["assists"] = stats["assists"];
+                        info["stats"]["goldEarned"] = stats["goldEarned"];
+                        info["stats"]["kills"] = stats["kills"];
+                        info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
+                        info["stats"]["winner"] = stats["winner"];
+                        info["stats"]["lane"] = lane;
 
-                    #append to instance variable "info"
-                    self.info.append(info)
+                        #append to instance variable "info"
+                        self.info.append(info)
                 else:
                     continue
 
@@ -111,7 +114,7 @@ class LolAggregate(object):
                 try:
                     self.options["request_limit"]
                 except NameError:
-                    print "unset"
+                    print("unset")
                 else:
                   if requests>=self.options["request_limit"]:
                       break
@@ -132,7 +135,7 @@ class LolAggregate(object):
 arguments = {
 "api_key":"RGAPI-5a0bc5da-5244-45f6-bfe1-b1a42b892835",
 "player_key":"36098962", #change the player id here, by changing this number you could get your own info instead of Pete's
-"request_limit":5 # will limit the number of requests by stopping loop after this number of requests
+"request_limit":20 # will limit the number of requests by stopping loop after this number of requests
 }
 
 #Main script calls
