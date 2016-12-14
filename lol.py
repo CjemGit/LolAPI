@@ -71,7 +71,7 @@ class LolAggregate(object):
         self.parsedMatches = LolAggregate.doCurl(self.matchesURL)
         #print json.dumps(self.parsedMatches, indent=4, sort_keys=True)
         #loop through response matches, append to matches instance variable
-        fail = True if "status" in self.parsedMatches["matches"] == "Present" else False
+        fail = True if "status" in self.parsedMatches["matches"] else False
         if fail==False:
             for match in self.parsedMatches["matches"]:
                  self.matches.append(match["matchId"])
