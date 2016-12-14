@@ -119,7 +119,7 @@ class LolAggregate(object):
                   if requests>=self.options["request_limit"]:
                       break
             else:
-                print "fail on initial request"
+                print("fail on initial request")
 
     #write instance varaibles to file
     def writeToFile(self):
