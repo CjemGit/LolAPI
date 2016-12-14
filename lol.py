@@ -66,54 +66,57 @@ class LolAggregate(object):
         self.parsedMatches = LolAggregate.doCurl(self.matchesURL)
         #print json.dumps(self.parsedMatches, indent=4, sort_keys=True)
         #loop through response matches, append to matches instance variable
-        for match in self.parsedMatches["matches"]:
-             self.matches.append(match["matchId"])
+        fail = True if "status" in self.parsedMatches["matches"] == "Present" else False
+        if fail==False:
+            for match in self.parsedMatches["matches"]:
+                 self.matches.append(match["matchId"])
 
-        #for each matchid, do curl on API, add to matchinfo instance variable
-        #for matchid in self.matches: #Strongly recommend limiting the number of times this runs maybe with range
-        requests = 0
-        for matchid in self.matches:
+            #for each matchid, do curl on API, add to matchinfo instance variable
+            #for matchid in self.matches: #Strongly recommend limiting the number of times this runs maybe with range
+            requests = 0
+            for matchid in self.matches:
 
-            requests+=1
-            # https://wiki.python.org/moin/ForLoop
-            #This line runs for every match returned by the first request.
-            #Petey has played a shit load of this game
-            info = {}
-            info["matchid"] = matchid
-            info["stats"] = {}
-                
-            if self.matchinfo[matchid] <> {"status":{"message": "429","status_code": 429}}:
+                requests+=1
+                # https://wiki.python.org/moin/ForLoop
+                #This line runs for every match returned by the first request.
+                #Petey has played a shit load of this game
+                info = {}
+                info["matchid"] = matchid
+                info["stats"] = {}
+
+
 
                 #traverse returned objects for info
                 self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
-                participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
-                lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
-                stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
-                
-                #assemble object
-                info["stats"]["assists"] = stats["assists"];
-                info["stats"]["goldEarned"] = stats["goldEarned"];
-                info["stats"]["kills"] = stats["kills"];
-                info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
-                info["stats"]["winner"] = stats["winner"];
-                info["stats"]["lane"] = lane;
+                fail = True if "status" in self.matchinfo[matchid] == "Present" else False
+                if fail==False:
+                    participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
+                    lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
+                    stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
 
-                #append to instance variable "info"
-                self.info.append(info)
-                
-            else
-            
-                continue
+                    #assemble object
+                    info["stats"]["assists"] = stats["assists"];
+                    info["stats"]["goldEarned"] = stats["goldEarned"];
+                    info["stats"]["kills"] = stats["kills"];
+                    info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
+                    info["stats"]["winner"] = stats["winner"];
+                    info["stats"]["lane"] = lane;
 
-            #break if request limit is set
-            try:
-                self.options["request_limit"]
-            except NameError:
-                print "unset"
+                    #append to instance variable "info"
+                    self.info.append(info)
+                else:
+                    continue
+
+                #break if request limit is set
+                try:
+                    self.options["request_limit"]
+                except NameError:
+                    print "unset"
+                else:
+                  if requests>=self.options["request_limit"]:
+                      break
             else:
-              if requests>=self.options["request_limit"]:
-                  break
-
+                print "fail on initial request"
 
     #write instance varaibles to file
     def writeToFile(self):
