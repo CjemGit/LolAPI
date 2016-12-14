@@ -81,23 +81,29 @@ class LolAggregate(object):
             info = {}
             info["matchid"] = matchid
             info["stats"] = {}
+                
+            if self.matchinfo[matchid] <> {"status":{"message": "429","status_code": 429}}:
 
-            #traverse returned objects for info
-            self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
-            participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
-            lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
-            stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
+                #traverse returned objects for info
+                self.matchinfo[matchid]=LolAggregate.getMatchInfo(matchid, self.options['api_key'])
+                participant = LolAggregate.getParticipantId(self.options["player_key"],self.matchinfo[matchid])
+                lane = self.matchinfo[matchid]["participants"][participant-1]["timeline"]["lane"]
+                stats = self.matchinfo[matchid]["participants"][participant-1]["stats"]
+                
+                #assemble object
+                info["stats"]["assists"] = stats["assists"];
+                info["stats"]["goldEarned"] = stats["goldEarned"];
+                info["stats"]["kills"] = stats["kills"];
+                info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
+                info["stats"]["winner"] = stats["winner"];
+                info["stats"]["lane"] = lane;
 
-            #assemble object
-            info["stats"]["assists"] = stats["assists"];
-            info["stats"]["goldEarned"] = stats["goldEarned"];
-            info["stats"]["kills"] = stats["kills"];
-            info["stats"]["totalDamageDealt"] = stats["totalDamageDealt"];
-            info["stats"]["winner"] = stats["winner"];
-            info["stats"]["lane"] = lane;
-
-            #append to instance variable "info"
-            self.info.append(info)
+                #append to instance variable "info"
+                self.info.append(info)
+                
+            else
+            
+                continue
 
             #break if request limit is set
             try:
