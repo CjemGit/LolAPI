@@ -17,6 +17,7 @@
 import sys;
 import requests;
 import json;
+import time;
 
 #define class
 class LolAggregate(object):
@@ -71,7 +72,7 @@ class LolAggregate(object):
         self.parsedMatches = LolAggregate.doCurl(self.matchesURL)
         #print json.dumps(self.parsedMatches, indent=4, sort_keys=True)
         #loop through response matches, append to matches instance variable
-        fail = True if "status" in self.parsedMatches["matches"] else False
+        fail = True if "status" in self.parsedMatches else False
         if fail==False:
             for match in self.parsedMatches["matches"]:
                  self.matches.append(match["matchId"])
@@ -82,6 +83,7 @@ class LolAggregate(object):
             for matchid in self.matches:
 
                 requests+=1
+                time.sleep(3)
                 # https://wiki.python.org/moin/ForLoop
                 #This line runs for every match returned by the first request.
                 #Petey has played a shit load of this game
@@ -136,7 +138,7 @@ class LolAggregate(object):
 arguments = {
 "api_key":"RGAPI-5a0bc5da-5244-45f6-bfe1-b1a42b892835",
 "player_key":"36098962", #change the player id here, by changing this number you could get your own info instead of Pete's
-"request_limit":20 # will limit the number of requests by stopping loop after this number of requests
+"request_limit":1000 # will limit the number of requests by stopping loop after this number of requests
 }
 
 #Main script calls
