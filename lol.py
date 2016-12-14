@@ -49,7 +49,8 @@ class LolAggregate(object):
     @staticmethod
     def getParticipantId(userID,matchInfo):
         #print json.dumps(matchInfo, indent=4, sort_keys=True)
-        success = True if "participantIdentities" in matchInfo == "Present" else False
+        success = True if "participantIdentities" in matchInfo else False
+        print("participants found "+ str(success))
         if success == True:
             for participant in matchInfo["participantIdentities"]:
                 if participant["player"]["summonerId"]==int(userID):
